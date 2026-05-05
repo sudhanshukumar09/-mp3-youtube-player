@@ -2,9 +2,12 @@ const API_BASE = "/api/search";
 
 let player;
 let currentVideo = "";
+let currentSong = null;
 let isPlaying = false;
 let searchTimer = null;
-let recentSongs = [];
+
+let likedSongs = JSON.parse(localStorage.getItem("likedSongs")) || [];
+let historySongs = JSON.parse(localStorage.getItem("historySongs")) || [];
 
 function onYouTubeIframeAPIReady() {
   player = new YT.Player("ytPlayer", {
@@ -23,11 +26,7 @@ function onYouTubeIframeAPIReady() {
 }
 
 function onPlayerStateChange(event) {
-  if (event.data === YT.PlayerState.PLAYING) {
-    isPlaying = true;
-  } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
-    isPlaying = false;
-  }
+  isPlaying = event.data === YT.PlayerState.PLAYING;
   updateButtons();
 }
 
@@ -37,6 +36,31 @@ function showPage(pageId, btn) {
 
   document.querySelectorAll(".bottom-nav button").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
+
+  if (pageId === "libraryPage") openLibrarySection("history");
+}
+
+function openSettings() {
+  document.getElementById("settingsPage").classList.add("active");
+}
+
+function closeSettings() {
+  document.getElementById("settingsPage").classList.remove("active");
+}
+
+function setTheme(theme) {
+  if (theme === "light") document.body.classList.add("light");
+  else document.body.classList.remove("light");
+
+  localStorage.setItem("theme", theme);
+}
+
+function saveLogin() {
+  const name = document.getElementById("loginName").value.trim();
+  if (!name) return;
+
+  localStorage.setItem("loginName", name);
+  document.getElementById("loginStatus").innerText = `Logged in as ${name}`;
 }
 
 async function quickSearch(query) {
@@ -46,11 +70,13 @@ async function quickSearch(query) {
 }
 
 async function searchSongs() {
-  const query = document.getElementById("searchInput").value.trim();
+  const input = document.getElementById("searchInput");
+  const query = input.value.trim();
   const box = document.getElementById("searchResults");
 
   if (!query) return;
 
+  input.blur();
   box.innerHTML = `<p>Searching...</p>`;
 
   try {
@@ -71,49 +97,64 @@ function renderSongs(items, container) {
   }
 
   items.forEach(item => {
-    const videoId = item.id.videoId;
-    const title = cleanText(item.snippet.title);
-    const channel = cleanText(item.snippet.channelTitle);
-    const image =
-      item.snippet.thumbnails.high?.url ||
-      item.snippet.thumbnails.medium?.url ||
-      item.snippet.thumbnails.default?.url;
+    const song = {
+      videoId: item.id.videoId,
+      title: cleanText(item.snippet.title),
+      channel: cleanText(item.snippet.channelTitle),
+      image:
+        item.snippet.thumbnails.high?.url ||
+        item.snippet.thumbnails.medium?.url ||
+        item.snippet.thumbnails.default?.url
+    };
 
-    const card = document.createElement("div");
-    card.className = "song-card";
-
-    card.innerHTML = `
-      <img src="${image}" alt="cover">
-      <div class="song-info">
-        <h3>${title}</h3>
-        <p>${channel}</p>
-      </div>
-      <button>▶</button>
-    `;
-
-    card.querySelector("button").addEventListener("click", () => {
-      selectSong(videoId, title, channel, image);
-    });
-
+    const card = createSongCard(song);
     container.appendChild(card);
   });
 }
 
-function selectSong(videoId, title, channel, image) {
-  currentVideo = videoId;
+function createSongCard(song) {
+  const card = document.createElement("div");
+  card.className = "song-card";
 
-  document.getElementById("miniCover").src = image;
-  document.getElementById("miniTitle").innerText = title;
-  document.getElementById("miniChannel").innerText = channel;
+  card.innerHTML = `
+    <img src="${song.image}" alt="cover">
+    <div class="song-info">
+      <h3>${song.title}</h3>
+      <p>${song.channel}</p>
+    </div>
+    <button>▶</button>
+  `;
 
-  document.getElementById("bigCover").src = image;
-  document.getElementById("bigTitle").innerText = title;
-  document.getElementById("bigChannel").innerText = channel;
+  card.addEventListener("click", () => {
+    selectSong(song);
+    openFullPlayer();
+  });
 
-  addRecent(videoId, title, channel, image);
+  card.querySelector("button").addEventListener("click", (e) => {
+    e.stopPropagation();
+    selectSong(song);
+  });
+
+  return card;
+}
+
+function selectSong(song) {
+  currentSong = song;
+  currentVideo = song.videoId;
+
+  document.getElementById("miniCover").src = song.image;
+  document.getElementById("miniTitle").innerText = song.title;
+  document.getElementById("miniChannel").innerText = song.channel;
+
+  document.getElementById("bigCover").src = song.image;
+  document.getElementById("bigTitle").innerText = song.title;
+  document.getElementById("bigChannel").innerText = song.channel;
+
+  updateLikeButton();
+  addHistory(song);
 
   if (player && player.loadVideoById) {
-    player.loadVideoById(videoId);
+    player.loadVideoById(song.videoId);
     isPlaying = true;
     updateButtons();
   }
@@ -140,12 +181,11 @@ function togglePlay() {
 
 function seekBy(seconds) {
   if (!player || !player.getCurrentTime) return;
-  const current = player.getCurrentTime();
-  player.seekTo(current + seconds, true);
+  player.seekTo(player.getCurrentTime() + seconds, true);
 }
 
 function updateButtons() {
-  const icon = isPlaying ? "⏸" : "▶";
+  const icon = isPlaying ? "Ⅱ" : "▶";
   document.getElementById("miniPlayBtn").innerText = icon;
   document.getElementById("mainPlayBtn").innerText = icon;
 }
@@ -156,8 +196,7 @@ function updateProgress() {
     const current = player.getCurrentTime() || 0;
 
     if (duration > 0) {
-      const percent = (current / duration) * 100;
-      document.getElementById("progressFill").style.width = `${percent}%`;
+      document.getElementById("progressFill").style.width = `${(current / duration) * 100}%`;
       document.getElementById("currentTime").innerText = formatTime(current);
       document.getElementById("durationTime").innerText = formatTime(duration);
     }
@@ -170,21 +209,26 @@ document.getElementById("timeline").addEventListener("click", function(e) {
   if (!player || !player.getDuration) return;
 
   const rect = this.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const percent = clickX / rect.width;
-  const duration = player.getDuration();
-
-  player.seekTo(duration * percent, true);
+  const percent = (e.clientX - rect.left) / rect.width;
+  player.seekTo(player.getDuration() * percent, true);
 });
 
 document.getElementById("searchInput").addEventListener("input", function() {
   clearTimeout(searchTimer);
-
   searchTimer = setTimeout(() => {
-    if (this.value.trim().length >= 2) {
-      searchSongs();
-    }
-  }, 450);
+    if (this.value.trim().length >= 2) searchSongs();
+  }, 500);
+});
+
+document.getElementById("searchInput").addEventListener("focus", function() {
+  this.select();
+});
+
+document.getElementById("searchInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    searchSongs();
+    this.blur();
+  }
 });
 
 function openFullPlayer() {
@@ -195,32 +239,82 @@ function closeFullPlayer() {
   document.getElementById("fullPlayer").classList.remove("active");
 }
 
-function addRecent(videoId, title, channel, image) {
-  recentSongs = recentSongs.filter(s => s.videoId !== videoId);
-  recentSongs.unshift({ videoId, title, channel, image });
-  recentSongs = recentSongs.slice(0, 8);
+function toggleLike() {
+  if (!currentSong) return;
 
-  const recentBox = document.getElementById("recentList");
-  recentBox.innerHTML = "";
+  const exists = likedSongs.some(s => s.videoId === currentSong.videoId);
 
-  recentSongs.forEach(song => {
-    const card = document.createElement("div");
-    card.className = "song-card";
-    card.innerHTML = `
-      <img src="${song.image}">
-      <div class="song-info">
-        <h3>${song.title}</h3>
-        <p>${song.channel}</p>
-      </div>
-      <button>▶</button>
-    `;
+  if (exists) {
+    likedSongs = likedSongs.filter(s => s.videoId !== currentSong.videoId);
+  } else {
+    likedSongs.unshift(currentSong);
+  }
 
-    card.querySelector("button").addEventListener("click", () => {
-      selectSong(song.videoId, song.title, song.channel, song.image);
-    });
+  localStorage.setItem("likedSongs", JSON.stringify(likedSongs));
+  updateLikeButton();
+}
 
-    recentBox.appendChild(card);
+function updateLikeButton() {
+  if (!currentSong) return;
+
+  const liked = likedSongs.some(s => s.videoId === currentSong.videoId);
+  document.getElementById("likeBtn").innerText = liked ? "♥" : "♡";
+}
+
+function addHistory(song) {
+  historySongs = historySongs.filter(s => s.videoId !== song.videoId);
+  historySongs.unshift(song);
+  historySongs = historySongs.slice(0, 30);
+
+  localStorage.setItem("historySongs", JSON.stringify(historySongs));
+}
+
+function openLibrarySection(type) {
+  const list = document.getElementById("libraryList");
+  const title = document.getElementById("libraryTitle");
+  const clearBtn = document.getElementById("clearHistoryBtn");
+
+  list.innerHTML = "";
+  clearBtn.style.display = "none";
+
+  let songs = [];
+
+  if (type === "liked") {
+    title.innerText = "Liked Songs";
+    songs = likedSongs;
+  }
+
+  if (type === "downloaded") {
+    title.innerText = "Downloaded";
+    list.innerHTML = `<p>No downloaded songs yet.</p>`;
+    return;
+  }
+
+  if (type === "top") {
+    title.innerText = "My Top 50";
+    songs = likedSongs;
+  }
+
+  if (type === "history") {
+    title.innerText = "History";
+    songs = historySongs;
+    clearBtn.style.display = "block";
+  }
+
+  if (!songs.length) {
+    list.innerHTML = `<p>No songs found.</p>`;
+    return;
+  }
+
+  songs.forEach(song => {
+    list.appendChild(createSongCard(song));
   });
+}
+
+function clearHistory() {
+  historySongs = [];
+  localStorage.setItem("historySongs", JSON.stringify(historySongs));
+  openLibrarySection("history");
 }
 
 function formatTime(sec) {
@@ -235,5 +329,13 @@ function cleanText(text) {
 }
 
 window.addEventListener("load", () => {
+  const theme = localStorage.getItem("theme");
+  if (theme === "light") document.body.classList.add("light");
+
+  const loginName = localStorage.getItem("loginName");
+  if (loginName) {
+    document.getElementById("loginStatus").innerText = `Logged in as ${loginName}`;
+  }
+
   quickSearch("bollywood songs");
 });
