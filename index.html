@@ -1,41 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EchoPlay - YouTube Music Search</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>EchoPlay</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <header>
-    <div class="logo">Echo<span>Play</span></div>
-    <p>Search YouTube music, view thumbnails, and play instantly.</p>
-  </header>
+<h1>EchoPlay 🎧</h1>
 
-  <main>
-    <section class="hero">
-      <h1>Discover & Play Music</h1>
-      <p>Search songs directly from YouTube and play them in a clean player.</p>
+<input id="searchInput" placeholder="Search song...">
+<button onclick="searchSongs()">Search</button>
 
-      <div class="search-box">
-        <input id="searchInput" type="text" placeholder="Search song, artist, remix..." />
-        <button onclick="searchSongs()">Search</button>
-      </div>
-    </section>
+<div class="player">
+  <img id="cover" src="">
+  <h3 id="title">Song Title</h3>
+  <audio id="audio" controls></audio>
+</div>
 
-    <section class="player-section">
-      <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-    </section>
+<div id="results"></div>
 
-    <h2 class="result-title">Search Results</h2>
-    <section id="results" class="results"></section>
-  </main>
-
-  <footer>
-    <p>Powered by YouTube • EchoPlay</p>
-  </footer>
-
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
