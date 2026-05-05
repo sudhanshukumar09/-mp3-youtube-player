@@ -1,21 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>YT Music Player</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EchoPlay - YouTube Music Search</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <h1>YT Music Player</h1>
+  <header>
+    <div class="logo">Echo<span>Play</span></div>
+    <p>Search YouTube music, view thumbnails, and play instantly.</p>
+  </header>
 
-  <div class="search-box">
-    <input id="searchInput" placeholder="Search song...">
-    <button onclick="searchSongs()">Search</button>
-  </div>
+  <main>
+    <section class="hero">
+      <h1>Discover & Play Music</h1>
+      <p>Search songs directly from YouTube and play them in a clean player.</p>
 
-  <iframe id="player" allow="autoplay" allowfullscreen></iframe>
+      <div class="search-box">
+        <input id="searchInput" type="text" placeholder="Search song, artist, remix..." />
+        <button onclick="searchSongs()">Search</button>
+      </div>
+    </section>
 
-  <div id="results"></div>
+    <section class="player-section">
+      <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </section>
+
+    <h2 class="result-title">Search Results</h2>
+    <section id="results" class="results"></section>
+  </main>
+
+  <footer>
+    <p>Powered by YouTube • EchoPlay</p>
+  </footer>
 
   <script src="script.js"></script>
 </body>
