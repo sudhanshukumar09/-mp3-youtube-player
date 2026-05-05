@@ -11,7 +11,7 @@
 <div class="app">
   <header class="topbar">
     <h1>MakeTune</h1>
-    <div class="top-icons">↻ ⚙</div>
+    <button class="settings-btn" onclick="openSettings()">⚙</button>
   </header>
 
   <main>
@@ -30,7 +30,7 @@
 
     <section id="searchPage" class="page">
       <div class="search-box">
-        <input id="searchInput" placeholder="Search songs, artists..." autocomplete="off" />
+        <input id="searchInput" placeholder="Search song..." autocomplete="off" />
       </div>
 
       <h2>Moods & moments</h2>
@@ -49,15 +49,20 @@
 
     <section id="libraryPage" class="page">
       <h2>Library</h2>
+
       <div class="library-grid">
-        <div>♡<span>Liked</span></div>
-        <div>↓<span>Downloaded</span></div>
-        <div>↗<span>My top 50</span></div>
-        <div>↻<span>Cached</span></div>
+        <div onclick="openLibrarySection('liked')">♡<span>Liked</span></div>
+        <div onclick="openLibrarySection('downloaded')">↓<span>Downloaded</span></div>
+        <div onclick="openLibrarySection('top')">↗<span>My top 50</span></div>
+        <div onclick="openLibrarySection('history')">↻<span>History</span></div>
       </div>
 
-      <h2>Recently Played</h2>
-      <div id="recentList" class="song-list"></div>
+      <div class="library-head">
+        <h2 id="libraryTitle">Recently Played</h2>
+        <button id="clearHistoryBtn" onclick="clearHistory()">Clear History</button>
+      </div>
+
+      <div id="libraryList" class="song-list"></div>
     </section>
   </main>
 
@@ -85,6 +90,7 @@
   <div class="full-info">
     <h2 id="bigTitle">Search and play a song</h2>
     <p id="bigChannel">MakeTune</p>
+    <button id="likeBtn" class="like-btn" onclick="toggleLike()">♡</button>
   </div>
 
   <div class="timeline" id="timeline">
@@ -97,9 +103,32 @@
   </div>
 
   <div class="player-controls">
-    <button onclick="seekBy(-10)">⏪</button>
+    <button onclick="seekBy(-10)" class="icon-btn">⏪</button>
     <button id="mainPlayBtn" class="main-play" onclick="togglePlay()">▶</button>
-    <button onclick="seekBy(10)">⏩</button>
+    <button onclick="seekBy(10)" class="icon-btn">⏩</button>
+  </div>
+</section>
+
+<section id="settingsPage" class="settings-page">
+  <button class="close-btn" onclick="closeSettings()">⌄</button>
+  <h2>Settings</h2>
+
+  <div class="setting-card">
+    <h3>Appearance</h3>
+    <button onclick="setTheme('dark')">Dark Theme</button>
+    <button onclick="setTheme('light')">Light Theme</button>
+  </div>
+
+  <div class="setting-card">
+    <h3>Playback Sensitivity</h3>
+    <input type="range" min="1" max="10" value="5">
+  </div>
+
+  <div class="setting-card">
+    <h3>Login</h3>
+    <input id="loginName" placeholder="Enter your name">
+    <button onclick="saveLogin()">Save Login</button>
+    <p id="loginStatus">Not logged in</p>
   </div>
 </section>
 
