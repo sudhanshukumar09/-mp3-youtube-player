@@ -1,29 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>EchoPlay</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FabTune</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<h1>EchoPlay 🎧</h1>
+  <div class="app">
 
-<input id="searchInput" placeholder="Search song...">
-<button onclick="searchSongs()">Search</button>
+    <header class="topbar">
+      <h1>FabTune</h1>
+      <div class="icons">⚙️</div>
+    </header>
 
-<div class="player">
-  <img id="cover" src="">
-  <h3 id="title">Song Title</h3>
+    <section class="search-area">
+      <input id="searchInput" type="text" placeholder="Search songs, artists..." />
+      <button onclick="searchSongs()">Search</button>
+    </section>
 
-  <button onclick="playSong()">▶️ Play</button>
-  <button onclick="stopSong()">⏹ Stop</button>
-</div>
+    <section class="hero">
+      <h2>Quick Picks</h2>
+      <p>Search your favorite songs and play instantly.</p>
+    </section>
 
-<!-- 👇 YouTube player hidden -->
-<iframe id="player"></iframe>
+    <section id="results" class="song-list">
+      <p class="hint">Search a song to start listening 🎧</p>
+    </section>
 
-<div id="results"></div>
+    <section class="mini-player" id="miniPlayer">
+      <img id="miniCover" src="https://via.placeholder.com/80" />
+      <div class="mini-info">
+        <h3 id="miniTitle">No song selected</h3>
+        <p id="miniChannel">FabTune</p>
+      </div>
+      <button id="playBtn" onclick="togglePlay()">▶</button>
+    </section>
 
-<script src="script.js"></script>
+  </div>
+
+  <section class="full-player" id="fullPlayer">
+    <button class="close-btn" onclick="closeFullPlayer()">⌄</button>
+
+    <img id="bigCover" class="big-cover" src="https://via.placeholder.com/400" />
+
+    <h2 id="bigTitle">No song selected</h2>
+    <p id="bigChannel">FabTune</p>
+
+    <div class="progress">
+      <span>0:00</span>
+      <div class="bar"><div></div></div>
+      <span>3:45</span>
+    </div>
+
+    <div class="controls">
+      <button>⏮</button>
+      <button class="main-control" onclick="togglePlay()">▶</button>
+      <button>⏭</button>
+    </div>
+  </section>
+
+  <!-- YouTube player hidden, display:none nahi lagana -->
+  <iframe id="player" allow="autoplay; encrypted-media"></iframe>
+
+  <script src="script.js"></script>
 </body>
 </html>
