@@ -14,8 +14,13 @@
 <div class="player">
   <img id="cover" src="">
   <h3 id="title">Song Title</h3>
-  <audio id="audio" controls></audio>
+
+  <button onclick="playSong()">▶️ Play</button>
+  <button onclick="stopSong()">⏹ Stop</button>
 </div>
+
+<!-- 👇 YouTube player hidden -->
+<iframe id="player"></iframe>
 
 <div id="results"></div>
 
