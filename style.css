@@ -431,9 +431,8 @@ h2 {
 }
 
 .like-btn.active {
-  color: #ff0000;
+  color: #ff4d6d; /* soft light red */
 }
-
 .timeline {
   max-width: 520px;
   height: 7px;
