@@ -58,7 +58,7 @@ function showMainPage(pageId, btn) {
   btn.classList.add("active");
 
   if (pageId === "searchPage") {
-    renderSearchHistory();
+    document.getElementById("searchHistoryBox").innerHTML = "";
     setTimeout(() => document.getElementById("searchInput").focus(), 100);
   }
 }
