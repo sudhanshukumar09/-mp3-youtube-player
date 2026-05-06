@@ -11,27 +11,15 @@
 <div class="app">
   <header class="topbar">
     <h1>MakeTune</h1>
-    <button class="settings-btn" onclick="openSettings()">⚙</button>
+    <button class="settings-btn" onclick="openSettings()" aria-label="Settings">
+      <svg viewBox="0 0 24 24"><path d="M19.4 13.5c.1-.5.1-1 .1-1.5s0-1-.1-1.5l2-1.5-2-3.5-2.4 1a7.7 7.7 0 0 0-2.6-1.5L14 2h-4l-.4 2.5A7.7 7.7 0 0 0 7 6L4.6 5l-2 3.5 2 1.5c-.1.5-.1 1-.1 1.5s0 1 .1 1.5l-2 1.5 2 3.5 2.4-1a7.7 7.7 0 0 0 2.6 1.5L10 22h4l.4-2.5a7.7 7.7 0 0 0 2.6-1.5l2.4 1 2-3.5-2-1.5ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"/></svg>
+    </button>
   </header>
 
   <main>
     <section id="homePage" class="page active">
       <h2>Quick picks</h2>
       <div id="quickPicks" class="song-list"></div>
-
-      <h2>Popular Mixes</h2>
-      <div class="mix-grid">
-        <button onclick="quickSearch('lofi songs')">Lofi Mix</button>
-        <button onclick="quickSearch('arijit singh songs')">Arijit Hits</button>
-        <button onclick="quickSearch('bollywood romantic songs')">Romantic</button>
-        <button onclick="quickSearch('party songs')">Party</button>
-      </div>
-    </section>
-
-    <section id="searchPage" class="page">
-      <div class="search-box">
-        <input id="searchInput" placeholder="Search song..." autocomplete="off" />
-      </div>
 
       <h2>Moods & moments</h2>
       <div class="mood-grid">
@@ -42,6 +30,15 @@
         <button onclick="quickSearch('romantic songs')">Romance</button>
         <button onclick="quickSearch('sleep music')">Sleep</button>
       </div>
+    </section>
+
+    <section id="searchPage" class="page">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24"><path d="M10.5 4a6.5 6.5 0 0 1 5.2 10.4l4 4-1.4 1.4-4-4A6.5 6.5 0 1 1 10.5 4Zm0 2a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Z"/></svg>
+        <input id="searchInput" placeholder="Search songs" autocomplete="off" />
+      </div>
+
+      <div id="searchHistoryBox" class="search-history"></div>
 
       <h2>Search Results</h2>
       <div id="searchResults" class="song-list"></div>
@@ -51,17 +48,31 @@
       <h2>Library</h2>
 
       <div class="library-grid">
-        <div onclick="openLibrarySection('liked')">♡<span>Liked</span></div>
-        <div onclick="openLibrarySection('downloaded')">↓<span>Downloaded</span></div>
-        <div onclick="openLibrarySection('top')">↗<span>My top 50</span></div>
-        <div onclick="openLibrarySection('history')">↻<span>History</span></div>
+        <div onclick="openLibraryPage('liked')">
+          <svg viewBox="0 0 24 24"><path d="M12 21s-7.2-4.4-9.5-9C.7 8.4 2.8 4.5 6.7 4.5c2 0 3.7 1.1 4.6 2.7.9-1.6 2.6-2.7 4.6-2.7 3.9 0 6 3.9 4.2 7.5C19.2 16.6 12 21 12 21Z"/></svg>
+          <span>Liked</span>
+        </div>
+        <div onclick="openLibraryPage('downloaded')">
+          <svg viewBox="0 0 24 24"><path d="M11 4h2v9l3.5-3.5 1.4 1.4L12 16.8l-5.9-5.9 1.4-1.4L11 13V4Zm-6 15h14v2H5v-2Z"/></svg>
+          <span>Downloaded</span>
+        </div>
+        <div onclick="openLibraryPage('top')">
+          <svg viewBox="0 0 24 24"><path d="M4 17h4v3H4v-3Zm6-6h4v9h-4v-9Zm6-7h4v16h-4V4Z"/></svg>
+          <span>My top 50</span>
+        </div>
+        <div onclick="openLibraryPage('history')">
+          <svg viewBox="0 0 24 24"><path d="M12 5a7 7 0 1 1-6.3 4H3.5A9 9 0 1 0 12 3v2ZM4 3v5h5V6H6.9A7 7 0 0 1 12 5V3a9 9 0 0 0-6.4 2.7V3H4Zm7 4h2v5l4 2-.9 1.8-5.1-2.6V7Z"/></svg>
+          <span>History</span>
+        </div>
       </div>
+    </section>
 
+    <section id="libraryDetailPage" class="page">
+      <button class="page-back" onclick="backToLibrary()">← Back</button>
       <div class="library-head">
-        <h2 id="libraryTitle">Recently Played</h2>
+        <h2 id="libraryTitle">Liked Songs</h2>
         <button id="clearHistoryBtn" onclick="clearHistory()">Clear History</button>
       </div>
-
       <div id="libraryList" class="song-list"></div>
     </section>
   </main>
@@ -72,25 +83,42 @@
       <h3 id="miniTitle">Search and play a song</h3>
       <p id="miniChannel">MakeTune</p>
     </div>
-    <button id="miniPlayBtn" onclick="event.stopPropagation(); togglePlay()">▶</button>
+    <button id="miniPlayBtn" onclick="event.stopPropagation(); togglePlay()" aria-label="Play">
+      <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7L8 5Z"/></svg>
+    </button>
   </div>
 
   <nav class="bottom-nav">
-    <button onclick="showPage('homePage', this)" class="active">⌂<span>Home</span></button>
-    <button onclick="showPage('searchPage', this)">⌕<span>Search</span></button>
-    <button onclick="showPage('libraryPage', this)">▥<span>Library</span></button>
+    <button onclick="showMainPage('homePage', this)" class="active">
+      <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3V10.5Z"/></svg>
+      <span>Home</span>
+    </button>
+    <button onclick="showMainPage('searchPage', this)">
+      <svg viewBox="0 0 24 24"><path d="M10.5 4a6.5 6.5 0 0 1 5.2 10.4l4 4-1.4 1.4-4-4A6.5 6.5 0 1 1 10.5 4Z"/></svg>
+      <span>Search</span>
+    </button>
+    <button onclick="showMainPage('libraryPage', this)">
+      <svg viewBox="0 0 24 24"><path d="M4 4h5v16H4V4Zm7 0h5v16h-5V4Zm7 0h2v16h-2V4Z"/></svg>
+      <span>Library</span>
+    </button>
   </nav>
 </div>
 
 <section id="fullPlayer" class="full-player">
-  <button class="close-btn" onclick="closeFullPlayer()">⌄</button>
+  <button class="close-btn" onclick="closeFullPlayer()" aria-label="Back">
+    <svg viewBox="0 0 24 24"><path d="M15.5 5 8.5 12l7 7-1.5 1.5L5.5 12 14 3.5 15.5 5Z"/></svg>
+  </button>
 
   <img id="bigCover" class="big-cover" src="https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg">
 
   <div class="full-info">
-    <h2 id="bigTitle">Search and play a song</h2>
-    <p id="bigChannel">MakeTune</p>
-    <button id="likeBtn" class="like-btn" onclick="toggleLike()">♡</button>
+    <div>
+      <h2 id="bigTitle">Search and play a song</h2>
+      <p id="bigChannel">MakeTune</p>
+    </div>
+    <button id="likeBtn" class="like-btn" onclick="toggleLike()" aria-label="Like">
+      <svg viewBox="0 0 24 24"><path d="M12 21s-7.2-4.4-9.5-9C.7 8.4 2.8 4.5 6.7 4.5c2 0 3.7 1.1 4.6 2.7.9-1.6 2.6-2.7 4.6-2.7 3.9 0 6 3.9 4.2 7.5C19.2 16.6 12 21 12 21Z"/></svg>
+    </button>
   </div>
 
   <div class="timeline" id="timeline">
@@ -103,14 +131,30 @@
   </div>
 
   <div class="player-controls">
-    <button onclick="seekBy(-10)" class="icon-btn">⏪</button>
-    <button id="mainPlayBtn" class="main-play" onclick="togglePlay()">▶</button>
-    <button onclick="seekBy(10)" class="icon-btn">⏩</button>
+    <button onclick="previousSong()" class="icon-btn" aria-label="Previous">
+      <svg viewBox="0 0 24 24"><path d="M6 5h2v14H6V5Zm3 7 10 7V5L9 12Z"/></svg>
+    </button>
+
+    <button id="mainPlayBtn" class="main-play" onclick="togglePlay()" aria-label="Play">
+      <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7L8 5Z"/></svg>
+    </button>
+
+    <button onclick="nextSong()" class="icon-btn" aria-label="Next">
+      <svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2V5ZM5 5v14l10-7L5 5Z"/></svg>
+    </button>
+  </div>
+
+  <div class="extra-controls">
+    <button id="loopBtn" onclick="toggleLoop()">Loop</button>
+    <button id="autoBtn" onclick="toggleAutoplay()">Autoplay</button>
   </div>
 </section>
 
 <section id="settingsPage" class="settings-page">
-  <button class="close-btn" onclick="closeSettings()">⌄</button>
+  <button class="close-btn" onclick="closeSettings()" aria-label="Back">
+    <svg viewBox="0 0 24 24"><path d="M15.5 5 8.5 12l7 7-1.5 1.5L5.5 12 14 3.5 15.5 5Z"/></svg>
+  </button>
+
   <h2>Settings</h2>
 
   <div class="setting-card">
