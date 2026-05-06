@@ -287,12 +287,7 @@ timeline.addEventListener("pointermove", e => {
 
 document.getElementById("searchInput").addEventListener("input", function() {
   clearTimeout(searchTimer);
-
-  if (this.value.trim() === "") {
-    showSearchHistory();
-  } else {
-    hideSearchHistory();
-  }
+  showSearchHistory();
 });
 
 document.getElementById("searchInput").addEventListener("focus", function() {
