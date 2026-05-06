@@ -4,7 +4,6 @@ let player;
 let currentVideo = "";
 let currentSong = null;
 let isPlaying = false;
-let searchTimer = null;
 
 let likedSongs = JSON.parse(localStorage.getItem("likedSongs")) || [];
 let historySongs = JSON.parse(localStorage.getItem("historySongs")) || [];
@@ -41,8 +40,12 @@ async function searchSongs() {
   if (!query) return;
 
   input.blur();
-
   saveSearchQuery(query);
+
+  // 🔥 Hide history immediately
+  const historyBox = document.getElementById("searchHistoryBox");
+  historyBox.style.display = "none";
+  historyBox.innerHTML = "";
 
   box.innerHTML = "Searching...";
 
@@ -54,10 +57,6 @@ async function searchSongs() {
 
     box.innerHTML = "";
     renderSongs(songs, box);
-
-    // 🔥 IMPORTANT FIX
-    document.getElementById("searchHistoryBox").innerHTML = "";
-    document.getElementById("searchHistoryBox").style.display = "none";
 
   } catch {
     box.innerHTML = "Search failed";
@@ -141,7 +140,7 @@ function updateButtons() {
   document.getElementById("miniPlayBtn").innerText = icon;
 }
 
-// ---------------- HISTORY ---------------- //
+// ---------------- SEARCH HISTORY ---------------- //
 
 function saveSearchQuery(query) {
   searchHistory = searchHistory.filter(q => q !== query);
@@ -155,6 +154,8 @@ function renderSearchHistory() {
   box.innerHTML = "";
 
   if (!searchHistory.length) return;
+
+  box.style.display = "grid";
 
   searchHistory.forEach(query => {
     const row = document.createElement("div");
@@ -181,27 +182,17 @@ function renderSearchHistory() {
   });
 }
 
-function addHistory(song) {
-  historySongs.unshift(song);
-  historySongs = historySongs.slice(0, 20);
-  localStorage.setItem("historySongs", JSON.stringify(historySongs));
-}
-
 // ---------------- EVENTS ---------------- //
 
 document.getElementById("searchInput").addEventListener("focus", function () {
   if (this.value.trim() === "") {
-    document.getElementById("searchHistoryBox").style.display = "grid";
     renderSearchHistory();
   }
 });
 
 document.getElementById("searchInput").addEventListener("keydown", function (e) {
   if (e.key === "Enter") {
-    document.getElementById("searchHistoryBox").innerHTML = "";
-    document.getElementById("searchHistoryBox").style.display = "none";
     searchSongs();
-    this.blur();
   }
 });
 
@@ -216,4 +207,10 @@ function cleanText(text) {
 function cleanTitle(text) {
   let t = cleanText(text);
   return t.replace(/#[\w\d_-]+/g, "").trim();
+}
+
+function addHistory(song) {
+  historySongs.unshift(song);
+  historySongs = historySongs.slice(0, 20);
+  localStorage.setItem("historySongs", JSON.stringify(historySongs));
 }
