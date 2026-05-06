@@ -504,3 +504,12 @@ window.addEventListener("load", () => {
     hideSearchHistory();
   }, 700);
 });
+// Disable right click
+document.addEventListener("contextmenu", e => {
+  e.preventDefault();
+});
+
+// Disable long press selection
+document.addEventListener("selectstart", e => {
+  e.preventDefault();
+});
